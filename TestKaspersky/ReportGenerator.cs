@@ -18,6 +18,11 @@ public class ReportGenerator : IReportGenerator
         string[] fileNameWords = fileName.ToString().Split('.', StringSplitOptions.RemoveEmptyEntries);
         int serviceIndex = GetServiceIndex(fileNameWords[0]);
         _serviceReports[serviceIndex].Rotation = isNotCurrentPath ? Convert.ToInt32(fileNameWords[1]) : 0;
+        ScanAllLines(path, serviceIndex);
+    }
+
+    private void ScanAllLines(string path, int serviceIndex)
+    {
         string[] lines = File.ReadAllLines(path);
         foreach (var line in lines)
         {

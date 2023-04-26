@@ -5,8 +5,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        FileSelector fileSelector = new FileSelector(new Regex(@"(\w*)"));
-        fileSelector.ScanDirectory(@"C:\MyProjects\TestKaspersky\TestKaspersky\TestData");
+        Console.Write("Введите путь к файлу: ");
+        string path = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException();
+        Console.Write("Введите регулярное выражение: ");
+        string regex = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(regex))
+            regex = @"\w*";
+        FileSelector fileSelector = new FileSelector(new Regex(regex));
+        fileSelector.ScanDirectory(path);
         fileSelector.ShowAll();
     }
 }
