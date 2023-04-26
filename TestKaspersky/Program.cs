@@ -9,7 +9,8 @@ class Program
         ServiceReport serviceReport1 = new ServiceReport("TestService1");
         ServiceReport serviceReport2 = new ServiceReport("TestService2");
         LogFileScaner logFileScaner = new LogFileScaner(new Regex(@"\w*"));
-        logFileScaner.Scan(@"C:\MyProjects\TestKaspersky\TestKaspersky\TestData\serviceA.0.log");
+        logFileScaner.Scan(@"C:\MyProjects\TestKaspersky\TestKaspersky\TestData\serviceA.log");
+        logFileScaner.Scan(@"C:\MyProjects\TestKaspersky\TestKaspersky\TestData\serviceB.1.log");
         serviceReport1.AddCategory("TestCategory");
         serviceReport1.AddCategory("TestCategory");
         serviceReport1.AddCategory("TestCategory");

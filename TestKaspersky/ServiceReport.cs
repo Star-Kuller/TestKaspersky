@@ -19,14 +19,14 @@ public class ServiceReport
     }
 
     public string ServiceName { get; }
-    private List<Category> _categorys = new List<Category>();
+    private readonly List<Category> _categorys = new List<Category>();
     private DateTime _earliest;
     private DateTime _latest;
     private int _rotation;
     public int Rotation
     {
         get => _rotation;
-        set => _rotation = value+1;
+        set => _rotation = ++value > _rotation ? value : _rotation;
     }
 
     public ServiceReport(string serviceName)

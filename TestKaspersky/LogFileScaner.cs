@@ -5,6 +5,7 @@ public class LogFileScaner
 {
     private readonly List<ServiceReport> _serviceReports = new List<ServiceReport>();
     private readonly Regex _pathRegex = new Regex(@"(\w*)\.(\d*)\.log");
+    private readonly Regex _currentPathRegex = new Regex(@"(\w*)\.log");
     private Regex _regex;
 
     public LogFileScaner(Regex regex)
@@ -14,27 +15,23 @@ public class LogFileScaner
 
     public void Scan(string path)
     {
-        Match fileName = _pathRegex.Match(path);
+        bool isCurrentPath = _pathRegex.IsMatch(path);
+        Match fileName = isCurrentPath ? _pathRegex.Match(path) : _currentPathRegex.Match(path);
         string[] fileNameWords = fileName.ToString().Split('.', StringSplitOptions.RemoveEmptyEntries);
-        int index = AddService(fileNameWords[0]);
-        Console.WriteLine(fileNameWords[0]);
-        Console.WriteLine(fileNameWords[1]);
-        Console.WriteLine(fileNameWords[2]);
-        _serviceReports[index].Rotation = Convert.ToInt32(fileNameWords[1]);
+        int serviceIndex = GetServiceIndex(fileNameWords[0]);
+        _serviceReports[serviceIndex].Rotation = isCurrentPath ? Convert.ToInt32(fileNameWords[1]) : 0;
         string[] lines = File.ReadAllLines(path);
         foreach (var line in lines)
         {
-            if (_regex.IsMatch(line))
-            {
-                string[] parts = line.Split(new[] { '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
-                _serviceReports[index].AddDate(DateTime.ParseExact(parts[0], $"dd.MM.yyyy HH:mm:ss.fff", null));
-            }
+            string[] parts = line.Split(new[] { '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+            _serviceReports[serviceIndex].AddDate(DateTime.ParseExact(parts[0], $"dd.MM.yyyy HH:mm:ss.fff", null));
+            _serviceReports[serviceIndex].AddCategory(parts[1]);
         }
 
-        _serviceReports[index].ReportToConsole();
+        _serviceReports[serviceIndex].ReportToConsole();
     }
     
-    public int AddService(string name)
+    private int GetServiceIndex(string name)
     {
         for (int i = 0; i <= _serviceReports.Count; i++)
         {
