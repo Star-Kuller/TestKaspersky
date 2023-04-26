@@ -17,15 +17,21 @@ public class ServiceReport
             Amount++;
         }
     }
-    private string _serviceName;
+
+    public string ServiceName { get; }
     private List<Category> _categorys = new List<Category>();
     private DateTime _earliest;
     private DateTime _latest;
-    private int _rotationCounter = 1;
-    
+    private int _rotation;
+    public int Rotation
+    {
+        get => _rotation;
+        set => _rotation = value+1;
+    }
+
     public ServiceReport(string serviceName)
     {
-        _serviceName = serviceName;
+        this.ServiceName = serviceName;
     }
 
     public void AddDate(DateTime dateTime)
@@ -42,7 +48,7 @@ public class ServiceReport
 
     public void AddCategory(string name)
     {
-        bool needToAdd = false;
+        bool needToAdd = true;
         for (int i = 0; i < _categorys.Count; i++)
         {
             if (_categorys[i].Name == name)
@@ -50,32 +56,27 @@ public class ServiceReport
                 Category c = _categorys[i];
                 c.IncrementAmount();
                 _categorys[i] = c;
-                needToAdd = true;
+                needToAdd = false;
             }
         }
 
-        if (needToAdd == false)
+        if (needToAdd == true)
         {
             _categorys.Add(new Category(name));
         }
     }
 
-    public void IncrementRotation()
-    {
-        _rotationCounter++;
-    }
-    
     public void ReportToConsole()
     {
-        Console.WriteLine($"\nСервис: {_serviceName}\n" +
-                          $"Самая ранняя запись: {_earliest}\n" +
-                          $"Самая поздняя запись: {_latest}");
+        Console.WriteLine($"\nСервис: {ServiceName}\n" +
+                          $"Самая ранняя запись: {_earliest.ToString($"dd.MM.yyyy HH:mm:ss.fff")}\n" +
+                          $"Самая поздняя запись: {_latest.ToString($"dd.MM.yyyy HH:mm:ss.fff")}");
         Console.Write("Всего записей:[");
         foreach (var c in _categorys)
         {
             Console.Write($" {c.Name}:{c.Amount}");
         }
         Console.WriteLine(" ]\n" +
-                          $"Количество ротаций: {_rotationCounter}");
+                          $"Количество ротаций: {Rotation}");
     }
 }
