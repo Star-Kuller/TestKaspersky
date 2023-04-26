@@ -17,8 +17,9 @@ public class FileSelector
         string[] allFiles = Directory.GetFiles(path);
         foreach (var file in allFiles)
         {
-            if(_regex.IsMatch(file))
-                _reportGenerator.Generate($"{file}");
+            string[] filePathWords = file.ToString().Split(new []{'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
+            if(_regex.IsMatch(filePathWords[filePathWords.Length-1]))
+                _reportGenerator.Generate(file);
         }
     }
 
