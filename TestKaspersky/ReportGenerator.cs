@@ -1,34 +1,31 @@
 namespace TestKaspersky;
 using System.Text.RegularExpressions;
 
-public class LogFileScaner
+public class ReportGenerator : IReportGenerator
 {
     private readonly List<ServiceReport> _serviceReports = new List<ServiceReport>();
     private readonly Regex _pathRegex = new Regex(@"(\w*)\.(\d*)\.log");
     private readonly Regex _currentPathRegex = new Regex(@"(\w*)\.log");
-    private Regex _regex;
 
-    public LogFileScaner(Regex regex)
-    {
-        _regex = regex;
-    }
+    public List<ServiceReport> ServiceReports => _serviceReports;
 
-    public void Scan(string path)
+    public void Generate(string path)
     {
-        bool isCurrentPath = _pathRegex.IsMatch(path);
-        Match fileName = isCurrentPath ? _pathRegex.Match(path) : _currentPathRegex.Match(path);
+        if ( !(_currentPathRegex.IsMatch(path) || _pathRegex.IsMatch(path)) )
+            return;
+        bool isNotCurrentPath = _pathRegex.IsMatch(path);
+        Match fileName = isNotCurrentPath ? _pathRegex.Match(path) : _currentPathRegex.Match(path);
         string[] fileNameWords = fileName.ToString().Split('.', StringSplitOptions.RemoveEmptyEntries);
         int serviceIndex = GetServiceIndex(fileNameWords[0]);
-        _serviceReports[serviceIndex].Rotation = isCurrentPath ? Convert.ToInt32(fileNameWords[1]) : 0;
+        _serviceReports[serviceIndex].Rotation = isNotCurrentPath ? Convert.ToInt32(fileNameWords[1]) : 0;
         string[] lines = File.ReadAllLines(path);
         foreach (var line in lines)
         {
             string[] parts = line.Split(new[] { '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
-            _serviceReports[serviceIndex].AddDate(DateTime.ParseExact(parts[0], $"dd.MM.yyyy HH:mm:ss.fff", null));
+            _serviceReports[serviceIndex].AddDate(DateTime.ParseExact(parts[0],
+                $"dd.MM.yyyy HH:mm:ss.fff", null));
             _serviceReports[serviceIndex].AddCategory(parts[1]);
         }
-
-        _serviceReports[serviceIndex].ReportToConsole();
     }
     
     private int GetServiceIndex(string name)
