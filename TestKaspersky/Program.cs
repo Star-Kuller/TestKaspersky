@@ -14,7 +14,8 @@ class Program
         if (string.IsNullOrWhiteSpace(regex))
             regex = @"\w*";
         FileSelector fileSelector = new FileSelector(new Regex(regex));
-        fileSelector.ScanDirectory(path);
+        Task task = fileSelector.ScanDirectory(path);
+        task.Wait();
         fileSelector.ShowAll();
     }
 }

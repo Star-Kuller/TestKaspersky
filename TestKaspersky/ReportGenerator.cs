@@ -11,7 +11,7 @@ public class ReportGenerator : IReportGenerator
 
     public void Generate(string path)
     {
-        if ( !(_currentPathRegex.IsMatch(path) || _pathRegex.IsMatch(path)) )
+        if (!(_currentPathRegex.IsMatch(path) || _pathRegex.IsMatch(path))) 
             return;
         bool isNotCurrentPath = _pathRegex.IsMatch(path);
         Match fileName = isNotCurrentPath ? _pathRegex.Match(path) : _currentPathRegex.Match(path);

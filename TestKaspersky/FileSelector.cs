@@ -12,15 +12,20 @@ public class FileSelector
         _regex = regex;
     }
 
-    public void ScanDirectory(string path)
+    public async Task ScanDirectory(string path)
     {
-        string[] allFiles = Directory.GetFiles(path);
-        foreach (var file in allFiles)
+        await Task.Run(() =>
         {
-            string[] filePathWords = file.ToString().Split(new []{'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
-            if(_regex.IsMatch(filePathWords[filePathWords.Length-1]))
-                _reportGenerator.Generate(file);
-        }
+            int progress = 0;
+            string[] allFiles = Directory.GetFiles(path);
+            foreach (var file in allFiles)
+            {
+                string[] filePathWords = file.Split(new []{'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
+                if (_regex.IsMatch(filePathWords[filePathWords.Length - 1]))
+                    _reportGenerator.Generate(file);
+                Console.WriteLine($"{++progress}/{allFiles.Length}");
+            }
+        });
     }
 
     public void ShowAll()
