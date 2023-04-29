@@ -26,18 +26,26 @@ public class CommandParcer : IParcer
                 Console.WriteLine("Помощь - Список комманд\n" +
                                   "Создать <Путь> <Шаблон> - Создаёт отчёт на основе логов из папки и шаблона (путь указывать без пробелов)\n" +
                                   "Статус <ID> - Узнать состояние отчёта под номером ID\n" +
+                                  "Статус - Узнать состояние всех отчётов\n" +
                                   "Завершить - Завершает работу программы");
                 break;
             case "Статус":
             case "статус":
-                if (_tasks.Count > Convert.ToInt32(commandWords[1]))
+                if (commandWords.Length != 2)
+                {
+                    Console.WriteLine($"Всего отчётов: {_tasks.Count}");
+                    foreach (var task in _tasks)
+                    {
+                        task.GetStatus();
+                    }
+                    break;
+                }
+                    if (_tasks.Count > Convert.ToInt32(commandWords[1]))
                 {
                     _tasks[Convert.ToInt32(commandWords[1])].GetStatus();
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("Такого отчёта нет");
-                }
+                Console.WriteLine("Такого отчёта нет");
                 break;
             case "Завершить":
             case "завершить":

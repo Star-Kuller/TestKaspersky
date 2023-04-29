@@ -6,6 +6,7 @@ public class ReportGenerator : IReportGenerator
     private readonly List<ServiceReport> _serviceReports = new List<ServiceReport>();
     private readonly Regex _pathRegex = new Regex(@"(\w*)\.(\d*)\.log");
     private readonly Regex _currentPathRegex = new Regex(@"(\w*)\.log");
+    private readonly Regex _mail = new Regex(@"(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)");
 
     public List<ServiceReport> ServiceReports => _serviceReports;
 
@@ -23,6 +24,7 @@ public class ReportGenerator : IReportGenerator
 
     private void ScanAllLines(string path, int serviceIndex)
     {
+        //string[] lines = HideMail(File.ReadAllLines(path));
         string[] lines = File.ReadAllLines(path);
         foreach (var line in lines)
         {
@@ -32,7 +34,19 @@ public class ReportGenerator : IReportGenerator
             _serviceReports[serviceIndex].AddCategory(parts[1]);
         }
     }
-    
+
+    private string[] HideMail(string[] lines)
+    {
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (_mail.IsMatch(lines[i]))
+            {
+                Regex.Replace(lines[i],@"\w+([-+.]\w+)*@", @"*");
+            }
+            Console.WriteLine(lines[i]);
+        }
+        return lines;
+    }
     private int GetServiceIndex(string name)
     {
         for (int i = 0; i <= _serviceReports.Count; i++)
