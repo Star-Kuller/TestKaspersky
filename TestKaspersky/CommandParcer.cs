@@ -5,7 +5,7 @@ namespace TestKaspersky;
 
 public class CommandParcer : IParcer
 {
-    private List<Task> _tasks = new List<Task>();
+    private List<FileSelector> _tasks = new List<FileSelector>();
     public void Parce(string command)
     {
         if(string.IsNullOrWhiteSpace(command))
@@ -17,8 +17,9 @@ public class CommandParcer : IParcer
             case "создать":
                 if (commandWords.Length != 3)
                     throw new ArgumentException("Неверное количество аргументов");
-                _tasks.Add(FileSelector.ScanDirectory(commandWords[1], new Regex(commandWords[2]), _tasks.Count));
-                Console.WriteLine($"ID: {_tasks.Count-1}");
+                _tasks.Add(new FileSelector(_tasks.Count));
+                _tasks[_tasks.Count - 1].ScanDirectory(commandWords[1], new Regex(commandWords[2]));
+                Console.WriteLine($"Отчёт {_tasks.Count-1} создан");
                 break;
             case "Помощь":
             case "помощь":
@@ -29,7 +30,14 @@ public class CommandParcer : IParcer
                 break;
             case "Статус":
             case "статус":
-                Console.WriteLine("WIP");
+                if (_tasks.Count > Convert.ToInt32(commandWords[1]))
+                {
+                    _tasks[Convert.ToInt32(commandWords[1])].GetStatus();
+                }
+                else
+                {
+                    Console.WriteLine("Такого отчёта нет");
+                }
                 break;
             case "Завершить":
             case "завершить":

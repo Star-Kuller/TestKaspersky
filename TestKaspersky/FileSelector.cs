@@ -2,31 +2,69 @@ using System.Text.RegularExpressions;
 
 namespace TestKaspersky;
 
-public static class FileSelector
+public class FileSelector
 {
-    public static async Task ScanDirectory(string path, Regex regex, int id)
+    private readonly int _id;
+    private int _progress = 0;
+    private int _max = 0;
+    private readonly IReportGenerator _reportGenerator = new ReportGenerator();
+    private const int ProgressBarLenght = 50;
+
+    public FileSelector(int id)
+    {
+        _id = id;
+    }
+
+    public async Task ScanDirectory(string path, Regex regex)
     {
         await Task.Run(() =>
         {
-            IReportGenerator reportGenerator = new ReportGenerator();
-            int progress = 0;
             string[] allFiles = Directory.GetFiles(path);
+            _max = allFiles.Length;
             foreach (var file in allFiles)
             {
                 string[] filePathWords = file.Split(new []{'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
                 if (regex.IsMatch(filePathWords[filePathWords.Length - 1]))
-                    reportGenerator.Generate(file);
-                Console.WriteLine($"Отчёт {id} - готовность: {++progress}/{allFiles.Length}");
-                Thread.Sleep(10000);
+                    _reportGenerator.Generate(file);
+                _progress++;
+                Thread.Sleep(5000);
             }
-            ShowAll(reportGenerator, id);
+            Console.WriteLine($"Отчёт {_id} - готов");
         });
     }
 
-    private static void ShowAll(IReportGenerator reportGenerator, int id)
+    public void GetStatus()
     {
-        Console.WriteLine($"Отчёт {id} - готов");
-        foreach (var report in reportGenerator.ServiceReports)
+        if (_progress == _max)
+        {
+            ShowAll();
+            return;
+        }
+        Console.WriteLine($"Отчёт {_id} - готовность {_progress}/{_max}");
+        Console.Write("[");
+        float progressBar = (float)_progress / _max;
+        for (int i = 0; i < ProgressBarLenght; i++)
+        {
+            if (i < progressBar*ProgressBarLenght)
+            {
+                Console.Write("=");
+            }
+            else
+            {
+                Console.Write(" ");
+            }
+        }
+        Console.WriteLine("]");
+    }
+    
+    private void ShowAll()
+    {
+        Console.WriteLine($"Отчёт {_id}: ");
+        if (_reportGenerator.ServiceReports.Count == 0)
+        {
+            Console.WriteLine("Отчёт пуст");
+        }
+            foreach (var report in _reportGenerator.ServiceReports)
         {
             report.ReportToConsole();
         }

@@ -77,6 +77,6 @@ public class ServiceReport
             Console.Write($" {c.Name}:{c.Amount}");
         }
         Console.WriteLine(" ]\n" +
-                          $"Количество ротаций: {Rotation}");
+                          $"Количество ротаций: {Rotation}\n");
     }
 }
