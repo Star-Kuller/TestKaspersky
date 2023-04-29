@@ -2,35 +2,31 @@ using System.Text.RegularExpressions;
 
 namespace TestKaspersky;
 
-public class FileSelector
+public static class FileSelector
 {
-    private readonly Regex _regex;
-    private readonly IReportGenerator _reportGenerator = new ReportGenerator();
-
-    public FileSelector(Regex regex)
-    {
-        _regex = regex;
-    }
-
-    public async Task ScanDirectory(string path)
+    public static async Task ScanDirectory(string path, Regex regex, int id)
     {
         await Task.Run(() =>
         {
+            IReportGenerator reportGenerator = new ReportGenerator();
             int progress = 0;
             string[] allFiles = Directory.GetFiles(path);
             foreach (var file in allFiles)
             {
                 string[] filePathWords = file.Split(new []{'\\', '/'}, StringSplitOptions.RemoveEmptyEntries);
-                if (_regex.IsMatch(filePathWords[filePathWords.Length - 1]))
-                    _reportGenerator.Generate(file);
-                Console.WriteLine($"{++progress}/{allFiles.Length}");
+                if (regex.IsMatch(filePathWords[filePathWords.Length - 1]))
+                    reportGenerator.Generate(file);
+                Console.WriteLine($"Отчёт {id} - готовность: {++progress}/{allFiles.Length}");
+                Thread.Sleep(10000);
             }
+            ShowAll(reportGenerator, id);
         });
     }
 
-    public void ShowAll()
+    private static void ShowAll(IReportGenerator reportGenerator, int id)
     {
-        foreach (var report in _reportGenerator.ServiceReports)
+        Console.WriteLine($"Отчёт {id} - готов");
+        foreach (var report in reportGenerator.ServiceReports)
         {
             report.ReportToConsole();
         }
