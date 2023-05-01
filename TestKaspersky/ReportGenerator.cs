@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace TestKaspersky;
 using System.Text.RegularExpressions;
 
@@ -24,8 +26,8 @@ public class ReportGenerator : IReportGenerator
 
     private void ScanAllLines(string path, int serviceIndex)
     {
-        //string[] lines = HideMail(File.ReadAllLines(path));
-        string[] lines = File.ReadAllLines(path);
+        string[] lines = HideMail(File.ReadAllLines(path));
+        //string[] lines = File.ReadAllLines(path);
         foreach (var line in lines)
         {
             string[] parts = line.Split(new[] { '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
@@ -39,14 +41,35 @@ public class ReportGenerator : IReportGenerator
     {
         for (int i = 0; i < lines.Length; i++)
         {
-            if (_mail.IsMatch(lines[i]))
-            {
-                Regex.Replace(lines[i],@"\w+([-+.]\w+)*@", @"*");
-            }
-            Console.WriteLine(lines[i]);
+            lines[i] = ReplaceMail(lines[i]);
+            //Console.WriteLine(lines[i]);
         }
         return lines;
     }
+
+    private string ReplaceMail(string line)
+    {
+        string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        string temp;
+        string returnstr = "";
+        foreach (var linePart in parts)
+        {
+            temp = linePart;
+            if (_mail.IsMatch(linePart))
+            {
+                for (int i = 0; i < linePart.Length; i++)
+                {
+                    if (linePart[i] == '@')
+                        break;
+                    if (i % 2 == 1) 
+                        temp = temp.Remove(i, 1).Insert(i, "*");
+                }
+            }
+            returnstr += temp + " ";
+        }
+        return returnstr;
+    }
+    
     private int GetServiceIndex(string name)
     {
         for (int i = 0; i <= _serviceReports.Count; i++)

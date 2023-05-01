@@ -11,9 +11,8 @@ public class CommandParcer : IParcer
         if(string.IsNullOrWhiteSpace(command))
             Console.WriteLine("Пустая строка");
         string[] commandWords = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        switch (commandWords[0])
+        switch (commandWords[0].ToLower())
         {
-            case "Создать":
             case "создать":
                 if (commandWords.Length != 3)
                     throw new ArgumentException("Неверное количество аргументов");
@@ -21,7 +20,6 @@ public class CommandParcer : IParcer
                 _tasks[_tasks.Count - 1].ScanDirectory(commandWords[1], new Regex(commandWords[2]));
                 Console.WriteLine($"Отчёт {_tasks.Count-1} создан");
                 break;
-            case "Помощь":
             case "помощь":
                 Console.WriteLine("Помощь - Список комманд\n" +
                                   "Создать <Путь> <Шаблон> - Создаёт отчёт на основе логов из папки и шаблона (путь указывать без пробелов)\n" +
@@ -29,7 +27,6 @@ public class CommandParcer : IParcer
                                   "Статус - Узнать состояние всех отчётов\n" +
                                   "Завершить - Завершает работу программы");
                 break;
-            case "Статус":
             case "статус":
                 if (commandWords.Length != 2)
                 {
@@ -47,7 +44,6 @@ public class CommandParcer : IParcer
                 }
                 Console.WriteLine("Такого отчёта нет");
                 break;
-            case "Завершить":
             case "завершить":
                 Process.GetCurrentProcess().Kill();
                 break;
