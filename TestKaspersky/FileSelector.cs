@@ -17,7 +17,7 @@ public class FileSelector
 
     public async Task ScanDirectory(string path, Regex regex)
     {
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
             string[] allFiles = Directory.GetFiles(path);
             _max = allFiles.Length;
@@ -27,7 +27,7 @@ public class FileSelector
                 if (regex.IsMatch(filePathWords[filePathWords.Length - 1]))
                     _reportGenerator.Generate(file);
                 _progress++;
-                Thread.Sleep(5000);
+                await Task.Delay(5000);
             }
             Console.WriteLine($"Отчёт {_id} - готов");
         });

@@ -60,7 +60,7 @@ public class ServiceReport
             }
         }
 
-        if (needToAdd == true)
+        if (needToAdd)
         {
             _categorys.Add(new Category(name));
         }

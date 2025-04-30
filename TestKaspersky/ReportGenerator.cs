@@ -11,7 +11,7 @@ public class ReportGenerator : IReportGenerator
     private readonly Regex _mail = new Regex(@"(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)");
 
     public List<ServiceReport> ServiceReports => _serviceReports;
-
+ 
     public void Generate(string path)
     {
         if (!(_currentPathRegex.IsMatch(path) || _pathRegex.IsMatch(path))) 
